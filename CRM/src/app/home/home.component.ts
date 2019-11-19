@@ -1,43 +1,51 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
-import { Subscription } from 'rxjs';
-import { first } from 'rxjs/operators';
+import { Component, OnInit, OnDestroy } from "@angular/core";
+import { Subscription } from "rxjs";
+import { first } from "rxjs/operators";
 
-import { User } from '../_models';
-import { UserService, AuthenticationService } from '../_services';
+import { User } from "../_models";
+import { UserService, AuthenticationService } from "../_services";
 
-@Component({ templateUrl: 'home.component.html' })
+@Component({ templateUrl: "home.component.html" })
 export class HomeComponent implements OnInit, OnDestroy {
-    currentUser: User;
-    currentUserSubscription: Subscription;
-    users: User[] = [];
+  currentUser: User;
+  currentUserSubscription: Subscription;
+  accounts: User[] = [];
 
-    constructor(
-        private authenticationService: AuthenticationService,
-        private userService: UserService
-    ) {
-        this.currentUserSubscription = this.authenticationService.currentUser.subscribe(user => {
-            this.currentUser = user;
-        });
-    }
+  constructor(
+    private authenticationService: AuthenticationService,
+    private userService: UserService
+  ) {
+    this.currentUserSubscription = this.authenticationService.currentUser.subscribe(
+      user => {
+        this.currentUser = user;
+      }
+    );
+  }
 
-    ngOnInit() {
-        this.loadAllUsers();
-    }
+  ngOnInit() {
+    this.loadMostPriorityAcc();
+  }
 
-    ngOnDestroy() {
-        // unsubscribe to ensure no memory leaks
-        this.currentUserSubscription.unsubscribe();
-    }
+  ngOnDestroy() {
+    // unsubscribe to ensure no memory leaks
+    this.currentUserSubscription.unsubscribe();
+  }
 
-    deleteUser(id: number) {
-        this.userService.delete(id).pipe(first()).subscribe(() => {
-            this.loadAllUsers()
-        });
-    }
+  deleteUser(id: number) {
+    this.userService
+      .delete(id)
+      .pipe(first())
+      .subscribe(() => {
+        this.loadMostPriorityAcc();
+      });
+  }
 
-    private loadAllUsers() {
-        this.userService.getAll().pipe(first()).subscribe(users => {
-            this.users = users;
-        });
-    }
+  private loadMostPriorityAcc() {
+    this.userService
+      .getAll()
+      .pipe(first())
+      .subscribe(accounts => {
+        this.accounts = accounts;
+      });
+  }
 }
